@@ -102,6 +102,39 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
             case '\0':
                 c->top = head;
                 return LEPT_PARSE_MISS_QUOTATION_MARK;
+            case '\\':
+                ch = *p++;
+                len = c->top - head;
+                switch (ch) {
+                case '\\':
+                    PUTC(c, '\\');
+                    break;
+                case '\/':
+                    PUTC(c, '\/');
+                    break;
+                case '"':
+                    PUTC(c, '\"');
+                    break;
+                case 'b':
+                    PUTC(c, '\b');
+                    break;
+                case 'f':
+                    PUTC(c, '\f');
+                    break;
+                case 'n':
+                    PUTC(c, '\n');
+                    break;
+                case 'r':
+                    PUTC(c, '\r');
+                    break;
+                case 't':
+                    PUTC(c, '\t');
+                    break;
+                default:
+                    lept_context_pop(c, len);
+                    return LEPT_PARSE_INVALID_STRING_ESCAPE;
+                }
+                break;
             default:
                 PUTC(c, ch);
         }
@@ -153,7 +186,6 @@ lept_type lept_get_type(const lept_value* v) {
 }
 
 int lept_get_boolean(const lept_value* v) {
-    /* \TODO */
     assert(v != NULL);
     return (v->type == LEPT_TRUE)? 1: 0;
 }
