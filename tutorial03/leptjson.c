@@ -135,6 +135,11 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
                     return LEPT_PARSE_INVALID_STRING_ESCAPE;
                 }
                 break;
+            case '\x01':
+            case '\x1F':
+                len = c->top - head;
+                lept_context_pop(c, len);
+                return LEPT_PARSE_INVALID_STRING_CHAR;
             default:
                 PUTC(c, ch);
         }
